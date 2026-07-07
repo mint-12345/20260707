@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>로또 추첨기</title>
+    <style>
+      :root {
+        --canvas: #0b0e11;
+        --panel: #1e2329;
+        --panel-2: #2b3139;
+        --panel-3: #14181f;
+        --line: #2b3139;
+        --line-strong: #3a3f46;
+        --text: #eaecef;
+        --muted: #707a8a;
+        --muted-strong: #929aa5;
+        --accent: #fcd535;
+        --accent-active: #f0b90b;
+        --accent-dim: #3a3a1f;
+        --success: #0ecb81;
+        --danger: #f6465d;
+        --shadow: 0 28px 96px rgba(0, 0, 0, 0.55);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        font-family: Inter, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 12% 18%, rgba(252, 213, 53, 0.14), transparent 22%),
+          radial-gradient(circle at 88% 82%, rgba(14, 203, 129, 0.12), transparent 24%),
+          linear-gradient(180deg, #050608 0%, var(--canvas) 45%, #0a0d10 100%);
+        margin: 0;
+        padding: 24px;
+      }
+
+      .app {
+        width: min(1180px, 100%);
+        margin: 0 auto;
+        padding: 12px 0 24px;
+      }
+
+      .shell {
+        background: rgba(11, 14, 17, 0.92);
+        border: 1px solid rgba(43, 49, 57, 0.9);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(30, 35, 41, 0.85), rgba(20, 24, 31, 0.88));
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.92rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .brand-mark {
+        width: 14px;
+        height: 14px;
+        border-radius: 4px;
+        background: var(--accent);
+        box-shadow: 0 0 0 6px rgba(252, 213, 53, 0.08);
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(20, 24, 31, 0.9);
+        color: var(--muted-strong);
+        font-size: 0.88rem;
+        white-space: nowrap;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--success);
+        box-shadow: 0 0 0 4px rgba(14, 203, 129, 0.12);
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+        gap: 18px;
+        padding: 22px;
+      }
+
+      .hero-copy,
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(30, 35, 41, 0.92), rgba(20, 24, 31, 0.96));
+      }
+
+      .hero-copy {
+        padding: 26px;
+        display: grid;
+        align-content: start;
+        gap: 16px;
+        min-height: 100%;
+      }
+
+      .eyebrow {
+        color: var(--accent);
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.2rem, 4.8vw, 4.3rem);
+        line-height: 0.98;
+        letter-spacing: -0.04em;
+        max-width: 10ch;
+      }
+
+      .subtitle {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.7;
+        max-width: 56ch;
+      }
+
+      .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 6px;
+      }
+
+      .kpi {
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: rgba(11, 14, 17, 0.72);
+        border: 1px solid var(--line);
+      }
+
+      .kpi-value {
+        display: block;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.03em;
+      }
+
+      .kpi-label {
+        display: block;
+        margin-top: 4px;
+        font-size: 0.84rem;
+        color: var(--muted);
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 6px;
+      }
+
+      button {
+        appearance: none;
+        border: 0;
+        cursor: pointer;
+        border-radius: 999px;
+        padding: 14px 20px;
+        font-size: 1rem;
+        font-weight: 700;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease, background 0.18s ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      button:active {
+        transform: translateY(1px);
+      }
+
+      .primary {
+        background: linear-gradient(180deg, var(--accent), var(--accent-active));
+        color: #181a20;
+        box-shadow: 0 12px 32px rgba(252, 213, 53, 0.18);
+      }
+
+      .secondary {
+        background: rgba(30, 35, 41, 0.95);
+        color: var(--text);
+        border: 1px solid var(--line-strong);
+      }
+
+      .card {
+        padding: 22px;
+        display: grid;
+        gap: 18px;
+        min-height: 100%;
+      }
+
+      .numbers {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(78px, 1fr));
+        gap: 12px;
+      }
+
+      .ball {
+        aspect-ratio: 1;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+        font-weight: 800;
+        color: #181a20;
+        background:
+          radial-gradient(circle at 30% 26%, #fff7b4 0 16%, #fcd535 44%, #eab308 100%);
+        box-shadow:
+          inset 0 -10px 18px rgba(120, 53, 15, 0.14),
+          0 12px 24px rgba(0, 0, 0, 0.38);
+        transform: translateY(6px) scale(0.9);
+        opacity: 0;
+        animation: pop 0.48s ease forwards;
+        border: 1px solid rgba(252, 213, 53, 0.28);
+      }
+
+      .ball.bonus {
+        background:
+          radial-gradient(circle at 30% 26%, #ddffe9 0 16%, #86efac 42%, #22c55e 100%);
+        border-color: rgba(34, 197, 94, 0.32);
+      }
+
+      .label {
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--muted-strong);
+        margin-bottom: 6px;
+      }
+
+      .meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 0.95rem;
+        flex-wrap: wrap;
+      }
+
+      .history {
+        display: grid;
+        gap: 12px;
+      }
+
+      .history-item {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: rgba(11, 14, 17, 0.72);
+        border: 1px solid var(--line);
+      }
+
+      .chip {
+        min-width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        display: inline-grid;
+        place-items: center;
+        font-weight: 800;
+        color: #181a20;
+        background: #eaecef;
+      }
+
+      .chip.bonus {
+        background: var(--success);
+        color: #ffffff;
+      }
+
+      .fade-in {
+        animation: fadeIn 0.35s ease both;
+      }
+
+      .official-wrap {
+        display: grid;
+        gap: 14px;
+      }
+
+      .official-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: rgba(11, 14, 17, 0.72);
+      }
+
+      .frame-wrap {
+        overflow: hidden;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: rgba(11, 14, 17, 0.72);
+      }
+
+      .official-frame {
+        width: 100%;
+        height: min(76vh, 760px);
+        border: 0;
+        display: block;
+        background: #fff;
+      }
+
+      .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 760px;
+      }
+
+      .results-table thead th {
+        text-align: left;
+        font-size: 0.8rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted-strong);
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(20, 24, 31, 0.94);
+      }
+
+      .results-table tbody td {
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(43, 49, 57, 0.8);
+        color: var(--text);
+        vertical-align: middle;
+      }
+
+      .results-table tbody tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .history-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .history-pill {
+        min-width: 30px;
+        height: 30px;
+        padding: 0 9px;
+        border-radius: 999px;
+        display: inline-grid;
+        place-items: center;
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: #181a20;
+        background: #eaecef;
+      }
+
+      .history-pill.bonus {
+        background: var(--success);
+        color: #ffffff;
+      }
+
+      @keyframes pop {
+        from {
+          transform: scale(0.55);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 640px) {
+        body {
+          padding: 12px;
+        }
+
+        .topbar,
+        .hero-grid {
+          padding-left: 14px;
+          padding-right: 14px;
+        }
+
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .kpi-row {
+          grid-template-columns: 1fr;
+        }
+
+        .status {
+          display: none;
+        }
+
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <div class="shell">
+        <header class="topbar">
+          <div class="brand">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span>Lotto Draw</span>
+          </div>
+          <div class="status">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span>1 - 45 / 중복 없음 / 실시간 추첨</span>
+          </div>
+        </header>
+
+        <section class="hero-grid">
+          <article class="hero-copy">
+            <div class="eyebrow">Binance-inspired / Dark Precision</div>
+            <h1>황금 번호를 빠르게 뽑아보세요</h1>
+            <p class="subtitle">
+              깊은 블랙 캔버스 위에 옐로우 CTA를 둔, 데이터 중심의 로또 추첨기입니다.
+              6개의 메인 번호와 1개의 보너스 번호를 매번 새로 생성합니다.
+            </p>
+
+            <div class="controls" aria-label="추첨 제어">
+              <button class="primary" id="drawBtn">번호 추첨하기</button>
+              <button class="secondary" id="resetBtn">기록 초기화</button>
+            </div>
+
+            <div class="kpi-row" aria-label="추첨 정보">
+              <div class="kpi">
+                <span class="kpi-value">6</span>
+                <span class="kpi-label">메인 번호</span>
+              </div>
+              <div class="kpi">
+                <span class="kpi-value">1</span>
+                <span class="kpi-label">보너스 번호</span>
+              </div>
+              <div class="kpi">
+                <span class="kpi-value">45</span>
+                <span class="kpi-label">번호 범위</span>
+              </div>
+            </div>
+          </article>
+
+          <aside class="card">
+            <div>
+              <div class="label">이번 추첨</div>
+              <div class="numbers" id="currentNumbers" aria-live="polite"></div>
+            </div>
+
+            <div class="meta">
+              <div id="currentSummary">아직 추첨되지 않았습니다.</div>
+              <div>기준: 1 ~ 45, 중복 없음</div>
+            </div>
+          </aside>
+        </section>
+
+        <section class="hero-grid" style="padding-top: 0;">
+          <div class="card" style="grid-column: 1 / -1;">
+            <div class="label">최근 기록</div>
+            <div class="history" id="history"></div>
+          </div>
+        </section>
+
+        <section class="hero-grid" style="padding-top: 0;">
+          <div class="card" style="grid-column: 1 / -1;">
+            <div class="official-wrap">
+              <div class="official-meta">
+                <div>
+                  <div class="label">공식 당첨번호</div>
+                  <div>동행복권 로또6/45 결과 페이지를 그대로 보여줍니다.</div>
+                </div>
+                <div id="officialStatus">HTML 단독 모드</div>
+              </div>
+
+              <div class="frame-wrap">
+                <iframe
+                  class="official-frame"
+                  src="https://www.dhlottery.co.kr/lt645/result"
+                  title="동행복권 로또6/45 공식 결과 페이지"
+                  loading="lazy"
+                  referrerpolicy="no-referrer"
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const drawBtn = document.getElementById("drawBtn");
+      const resetBtn = document.getElementById("resetBtn");
+      const currentNumbers = document.getElementById("currentNumbers");
+      const currentSummary = document.getElementById("currentSummary");
+      const history = document.getElementById("history");
+      const officialStatus = document.getElementById("officialStatus");
+
+      const MAX_HISTORY = 8;
+      const draws = [];
+
+      function makeDraw() {
+        const pool = Array.from({ length: 45 }, (_, i) => i + 1);
+        const picked = [];
+
+        while (picked.length < 7) {
+          const index = Math.floor(Math.random() * pool.length);
+          picked.push(pool.splice(index, 1)[0]);
+        }
+
+        const sortedMain = picked.slice(0, 6).sort((a, b) => a - b);
+        const bonus = picked[6];
+
+        return { main: sortedMain, bonus };
+      }
+
+      function renderCurrent(draw) {
+        currentNumbers.innerHTML = "";
+
+        draw.main.forEach((num, index) => {
+          const ball = document.createElement("div");
+          ball.className = "ball fade-in";
+          ball.style.animationDelay = `${index * 70}ms`;
+          ball.textContent = num;
+          currentNumbers.appendChild(ball);
+        });
+
+        const bonusBall = document.createElement("div");
+        bonusBall.className = "ball bonus fade-in";
+        bonusBall.style.animationDelay = "420ms";
+        bonusBall.textContent = draw.bonus;
+        currentNumbers.appendChild(bonusBall);
+
+        currentSummary.textContent = `당첨 번호: ${draw.main.join(", ")} / 보너스: ${draw.bonus}`;
+      }
+
+      function renderHistory() {
+        history.innerHTML = "";
+
+        draws.slice(0, MAX_HISTORY).forEach((draw, index) => {
+          const row = document.createElement("div");
+          row.className = "history-item fade-in";
+          row.style.animationDelay = `${index * 40}ms`;
+
+          const label = document.createElement("strong");
+          label.textContent = `${draws.length - index}회차`;
+
+          row.appendChild(label);
+
+          draw.main.forEach((num) => {
+            const chip = document.createElement("span");
+            chip.className = "chip";
+            chip.textContent = num;
+            row.appendChild(chip);
+          });
+
+          const bonusChip = document.createElement("span");
+          bonusChip.className = "chip bonus";
+          bonusChip.textContent = `+${draw.bonus}`;
+          row.appendChild(bonusChip);
+
+          history.appendChild(row);
+        });
+
+        if (!draws.length) {
+          const empty = document.createElement("div");
+          empty.className = "history-item";
+          empty.textContent = "아직 기록이 없습니다. 추첨 버튼을 눌러 시작하세요.";
+          history.appendChild(empty);
+        }
+      }
+
+      function loadOfficialHistory() {
+        officialStatus.textContent = "외부 API 없이 공식 페이지를 iframe으로 표시합니다.";
+      }
+
+      drawBtn.addEventListener("click", () => {
+        const draw = makeDraw();
+        draws.unshift(draw);
+        renderCurrent(draw);
+        renderHistory();
+      });
+
+      resetBtn.addEventListener("click", () => {
+        draws.length = 0;
+        currentNumbers.innerHTML = "";
+        currentSummary.textContent = "아직 추첨되지 않았습니다.";
+        renderHistory();
+      });
+
+      renderHistory();
+      loadOfficialHistory();
+    </script>
+  </body>
+</html>
