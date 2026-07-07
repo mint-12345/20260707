@@ -6,21 +6,23 @@
     <title>로또 추첨기</title>
     <style>
       :root {
-        --canvas: #0b0e11;
-        --panel: #1e2329;
-        --panel-2: #2b3139;
-        --panel-3: #14181f;
-        --line: #2b3139;
-        --line-strong: #3a3f46;
-        --text: #eaecef;
-        --muted: #707a8a;
-        --muted-strong: #929aa5;
-        --accent: #fcd535;
-        --accent-active: #f0b90b;
-        --accent-dim: #3a3a1f;
-        --success: #0ecb81;
-        --danger: #f6465d;
-        --shadow: 0 28px 96px rgba(0, 0, 0, 0.55);
+        --canvas: #ffffff;
+        --surface: #f6f5f4;
+        --surface-soft: #fafaf9;
+        --panel: #ffffff;
+        --panel-2: #f7f5f2;
+        --panel-3: #f0eeec;
+        --line: #e5e3df;
+        --line-strong: #c8c4be;
+        --text: #1a1a1a;
+        --muted: #5d5b54;
+        --muted-strong: #787671;
+        --accent: #5645d4;
+        --accent-active: #4534b3;
+        --accent-dim: #e6e0f5;
+        --success: #1aae39;
+        --danger: #e03131;
+        --shadow: 0 22px 60px rgba(15, 15, 15, 0.08);
       }
 
       * {
@@ -34,28 +36,30 @@
       }
 
       body {
-        font-family: Inter, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+        font-family: Inter, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
         color: var(--text);
         background:
-          radial-gradient(circle at 12% 18%, rgba(252, 213, 53, 0.14), transparent 22%),
-          radial-gradient(circle at 88% 82%, rgba(14, 203, 129, 0.12), transparent 24%),
-          linear-gradient(180deg, #050608 0%, var(--canvas) 45%, #0a0d10 100%);
+          radial-gradient(circle at 8% 12%, rgba(86, 69, 212, 0.12), transparent 22%),
+          radial-gradient(circle at 90% 16%, rgba(221, 91, 0, 0.08), transparent 18%),
+          radial-gradient(circle at 84% 88%, rgba(42, 157, 153, 0.08), transparent 20%),
+          linear-gradient(180deg, #ffffff 0%, var(--surface) 100%);
         margin: 0;
-        padding: 24px;
+        padding: 20px;
       }
 
       .app {
         width: min(1180px, 100%);
         margin: 0 auto;
-        padding: 12px 0 24px;
+        padding: 10px 0 20px;
       }
 
       .shell {
-        background: rgba(11, 14, 17, 0.92);
-        border: 1px solid rgba(43, 49, 57, 0.9);
-        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid rgba(229, 227, 223, 0.9);
+        border-radius: 28px;
         box-shadow: var(--shadow);
         overflow: hidden;
+        backdrop-filter: blur(14px);
       }
 
       .topbar {
@@ -65,25 +69,25 @@
         gap: 16px;
         padding: 18px 22px;
         border-bottom: 1px solid var(--line);
-        background: linear-gradient(180deg, rgba(30, 35, 41, 0.85), rgba(20, 24, 31, 0.88));
+        background: rgba(255, 255, 255, 0.9);
       }
 
       .brand {
         display: flex;
         align-items: center;
         gap: 12px;
-        font-size: 0.92rem;
+        font-size: 0.9rem;
         font-weight: 700;
         letter-spacing: 0.08em;
         text-transform: uppercase;
       }
 
       .brand-mark {
-        width: 14px;
-        height: 14px;
-        border-radius: 4px;
-        background: var(--accent);
-        box-shadow: 0 0 0 6px rgba(252, 213, 53, 0.08);
+        width: 16px;
+        height: 16px;
+        border-radius: 5px;
+        background: linear-gradient(180deg, var(--accent), #7b6bf0);
+        box-shadow: 0 8px 18px rgba(86, 69, 212, 0.18);
       }
 
       .status {
@@ -93,7 +97,7 @@
         padding: 8px 12px;
         border: 1px solid var(--line);
         border-radius: 999px;
-        background: rgba(20, 24, 31, 0.9);
+        background: rgba(250, 250, 249, 0.92);
         color: var(--muted-strong);
         font-size: 0.88rem;
         white-space: nowrap;
@@ -104,34 +108,37 @@
         height: 8px;
         border-radius: 999px;
         background: var(--success);
-        box-shadow: 0 0 0 4px rgba(14, 203, 129, 0.12);
+        box-shadow: 0 0 0 4px rgba(26, 174, 57, 0.12);
       }
 
       .hero-grid {
         display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
-        gap: 18px;
+        grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+        gap: 16px;
         padding: 22px;
       }
 
       .hero-copy,
       .card {
         border: 1px solid var(--line);
-        border-radius: 20px;
-        background: linear-gradient(180deg, rgba(30, 35, 41, 0.92), rgba(20, 24, 31, 0.96));
+        border-radius: 22px;
+        background: var(--panel);
       }
 
       .hero-copy {
-        padding: 26px;
+        padding: 28px;
         display: grid;
         align-content: start;
-        gap: 16px;
+        gap: 18px;
         min-height: 100%;
+        background:
+          radial-gradient(circle at top right, rgba(86, 69, 212, 0.09), transparent 28%),
+          linear-gradient(180deg, #ffffff 0%, #faf9f7 100%);
       }
 
       .eyebrow {
         color: var(--accent);
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         letter-spacing: 0.08em;
         text-transform: uppercase;
         font-weight: 700;
@@ -139,9 +146,9 @@
 
       h1 {
         margin: 0;
-        font-size: clamp(2.2rem, 4.8vw, 4.3rem);
-        line-height: 0.98;
-        letter-spacing: -0.04em;
+        font-size: clamp(2.3rem, 5vw, 4.2rem);
+        line-height: 1.02;
+        letter-spacing: -0.05em;
         max-width: 10ch;
       }
 
@@ -163,7 +170,7 @@
       .kpi {
         padding: 14px 16px;
         border-radius: 16px;
-        background: rgba(11, 14, 17, 0.72);
+        background: var(--surface-soft);
         border: 1px solid var(--line);
       }
 
@@ -210,12 +217,12 @@
 
       .primary {
         background: linear-gradient(180deg, var(--accent), var(--accent-active));
-        color: #181a20;
-        box-shadow: 0 12px 32px rgba(252, 213, 53, 0.18);
+        color: #ffffff;
+        box-shadow: 0 12px 28px rgba(86, 69, 212, 0.18);
       }
 
       .secondary {
-        background: rgba(30, 35, 41, 0.95);
+        background: transparent;
         color: var(--text);
         border: 1px solid var(--line-strong);
       }
@@ -225,6 +232,7 @@
         display: grid;
         gap: 18px;
         min-height: 100%;
+        background: linear-gradient(180deg, #ffffff 0%, #fafaf9 100%);
       }
 
       .numbers {
@@ -240,22 +248,22 @@
         place-items: center;
         font-size: clamp(1.15rem, 2.2vw, 1.6rem);
         font-weight: 800;
-        color: #181a20;
+        color: #ffffff;
         background:
-          radial-gradient(circle at 30% 26%, #fff7b4 0 16%, #fcd535 44%, #eab308 100%);
+          radial-gradient(circle at 30% 26%, rgba(255, 255, 255, 0.42) 0 16%, #6b5cf0 44%, #4b3db8 100%);
         box-shadow:
-          inset 0 -10px 18px rgba(120, 53, 15, 0.14),
-          0 12px 24px rgba(0, 0, 0, 0.38);
+          inset 0 -10px 18px rgba(0, 0, 0, 0.16),
+          0 12px 24px rgba(86, 69, 212, 0.16);
         transform: translateY(6px) scale(0.9);
         opacity: 0;
         animation: pop 0.48s ease forwards;
-        border: 1px solid rgba(252, 213, 53, 0.28);
+        border: 1px solid rgba(86, 69, 212, 0.24);
       }
 
       .ball.bonus {
         background:
-          radial-gradient(circle at 30% 26%, #ddffe9 0 16%, #86efac 42%, #22c55e 100%);
-        border-color: rgba(34, 197, 94, 0.32);
+          radial-gradient(circle at 30% 26%, rgba(255, 255, 255, 0.35) 0 16%, #dd5b00 42%, #b84400 100%);
+        border-color: rgba(221, 91, 0, 0.28);
       }
 
       .label {
@@ -288,7 +296,7 @@
         gap: 10px;
         padding: 14px 16px;
         border-radius: 16px;
-        background: rgba(11, 14, 17, 0.72);
+        background: var(--surface-soft);
         border: 1px solid var(--line);
       }
 
@@ -299,12 +307,12 @@
         display: inline-grid;
         place-items: center;
         font-weight: 800;
-        color: #181a20;
-        background: #eaecef;
+        color: #1a1a1a;
+        background: #f0eeec;
       }
 
       .chip.bonus {
-        background: var(--success);
+        background: var(--accent);
         color: #ffffff;
       }
 
@@ -331,7 +339,7 @@
         overflow-x: auto;
         border-radius: 16px;
         border: 1px solid var(--line);
-        background: rgba(11, 14, 17, 0.72);
+        background: var(--surface-soft);
       }
 
       .frame-wrap {
@@ -363,12 +371,12 @@
         color: var(--muted-strong);
         padding: 14px 16px;
         border-bottom: 1px solid var(--line);
-        background: rgba(20, 24, 31, 0.94);
+        background: #fafaf9;
       }
 
       .results-table tbody td {
         padding: 14px 16px;
-        border-bottom: 1px solid rgba(43, 49, 57, 0.8);
+        border-bottom: 1px solid rgba(229, 227, 223, 0.8);
         color: var(--text);
         vertical-align: middle;
       }
@@ -392,8 +400,8 @@
         place-items: center;
         font-size: 0.88rem;
         font-weight: 800;
-        color: #181a20;
-        background: #eaecef;
+        color: #1a1a1a;
+        background: #f0eeec;
       }
 
       .history-pill.bonus {
@@ -468,10 +476,10 @@
 
         <section class="hero-grid">
           <article class="hero-copy">
-            <div class="eyebrow">로또 추첨기 / Dark Precision</div>
-            <h1>황금 번호를 빠르게 뽑아보세요</h1>
+            <div class="eyebrow">Notion-inspired / Editorial Calm</div>
+            <h1>로또 결과를 깔끔하게 정리해보세요</h1>
             <p class="subtitle">
-              깊은 블랙 캔버스 위에 옐로우 CTA를 둔, 데이터 중심의 로또 추첨기입니다.
+              밝은 캔버스와 보라색 포인트를 쓰는 노션 계열 템플릿으로 바꿨습니다.
               6개의 메인 번호와 1개의 보너스 번호를 매번 새로 생성합니다.
             </p>
 
